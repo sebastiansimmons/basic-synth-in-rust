@@ -3,10 +3,14 @@ extern crate vst;
 
 use vst::plugin::{Info, Plugin, Category};
 use vst::buffer::AudioBuffer;
+use vst::event::Event;
+use vst::api::Events;
 use rand::random;
 
 #[derive(Default)]
-struct Whisper;
+struct Whisper {
+    notes: u8,
+}
 
 impl Plugin for Whisper {
     fn get_info(&self) -> Info {
@@ -29,7 +33,32 @@ impl Plugin for Whisper {
         }
     }
 
+    fn process_events(&mut self, events: &Events) {
+        // not all events are midi
+        for event in events.events() {
+            match event {
+                Event::Midi(ev) => {
+                    match ev.data[0]{
+                        // Note on
+                        144 => self.notes += 1u8,
+
+                        // Note off
+                        128 => self.notes -= 1u8,
+
+                        _ => (),
+                    }
+
+                },
+                // ignore all other events
+                _ => (),
+            }
+        }
+    }
+
     fn process(&mut self, buffer: &mut AudioBuffer<f32>) {
+        // returns if no midi note is being pressed
+        if self.notes == 0 { return }
+
         let (_, mut output_buffer) = buffer.split();
 
         for output_channel in output_buffer.into_iter() {
