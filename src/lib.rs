@@ -1,12 +1,12 @@
 #[macro_use]
 extern crate vst;
 
-use vst::plugin::{Info, Plugin};
+use vst::plugin::{Info, Plugin, Category};
 
 #[derive(Default)]
 struct Whisper;
 
-impl Plugin for Whisper_vst {
+impl Plugin for Whisper {
     fn get_info(&self) -> Info {
         Info {
             name: "whispter_vst".to_string(),
@@ -28,4 +28,4 @@ impl Plugin for Whisper_vst {
     }
 }
 
-plugin_main!(Whispter_vst);
+plugin_main!(Whisper);
